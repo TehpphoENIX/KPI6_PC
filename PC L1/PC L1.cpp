@@ -12,12 +12,21 @@ using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 using std::cout;
 
-const unsigned int sizeOfArray = 10000;
+unsigned int sizeOfArray = 10000;
 unsigned int numberOfThreads = 1;
 int minRandValue = 0, maxRandValue = 10;
+bool logMatrix = false;
+
+enum Parameter {
+	size = 1,
+	sizeThreads = 2,
+	sizeThreadsMin = 3,
+	sizeThreadsMinMax = 4,
+	sizeThreadsMinMaxLog = 5
+};
 
 //target 
-int Array[sizeOfArray][sizeOfArray] = {};
+std::vector<std::vector<int>> Array;
 
 int intRand(const int& min, const int& max) {
 	static thread_local std::mt19937 generator;
@@ -35,8 +44,6 @@ void print(std::ofstream& file) {
 		}
 		file << '\n' << std::endl;
 	}
-
-
 }
 
 void randomizeCellsEx(const unsigned int startPos, const unsigned int EndPos) {
@@ -69,18 +76,27 @@ int main(int argc, char* argv[])
 		params.push_back(std::string(argv[i]));
 	}
 
+	auto it = params.rbegin();
 	switch (params.size()) 
 	{
-	case 3:
-		maxRandValue = std::stoi(params[2]);
-	case 2:
-		minRandValue = std::stoi(params[1]);
-	case 1:
-		numberOfThreads = std::stoi(params[0]);
+	case sizeThreadsMinMaxLog:
+		logMatrix = std::stoi(*it);
+		it++;
+	case sizeThreadsMinMax:
+		maxRandValue = std::stoi(*it);
+		it++;
+	case sizeThreadsMin:
+		minRandValue = std::stoi(*it);
+		it++;
+	case sizeThreads:
+		numberOfThreads = std::stoi(*it);
+		it++;
+	case size:
+		sizeOfArray = std::stoi(*it);
 	}
 
-	const float randOpPerThread = (float)sizeOfArray * sizeOfArray / numberOfThreads,
-		calcOpPerThread = (float)sizeOfArray / numberOfThreads;
+	const double randOpPerThread = (double)sizeOfArray * sizeOfArray / numberOfThreads,
+		calcOpPerThread = (double)sizeOfArray / numberOfThreads;
 
 	cout << "Starting parameters:" <<
 		"\n Matrix height/width: " << sizeOfArray <<
@@ -90,8 +106,10 @@ int main(int argc, char* argv[])
 		"\n Random operations per thread: " << randOpPerThread <<
 		"\n Calculations per thread: " << calcOpPerThread << std::endl;
 
-	std::ofstream matrixSave("PCL1.log");
+	Array = std::vector<std::vector<int>>(sizeOfArray, std::vector<int>(sizeOfArray, 0));
 
+	std::ofstream matrixSave("PCL1(1).log");
+	std::ofstream matrixSave2("PCL1(2).log");
 
 	std::vector<std::thread> threads;
 	
@@ -99,7 +117,7 @@ int main(int argc, char* argv[])
 	for (size_t i = 0; i < numberOfThreads; i++)
 	{
 		unsigned int start = i * randOpPerThread;
-		unsigned int end = (i + 1) * randOpPerThread-1;
+		unsigned int end = (i + 1) * randOpPerThread - 1;
 		threads.push_back(thread(randomizeCellsEx, start, end));
 	}
 	for (thread& th : threads)
@@ -111,8 +129,13 @@ int main(int argc, char* argv[])
 
 	threads.clear();
 	cout << "Randomized in " << (elapsed.count() * 1e-9) << " s\n" << std::endl;
-	/*print(matrixSave);
-	cout << "Logged" << std::endl;*/
+
+	if (logMatrix)
+	{
+		print(matrixSave);
+		cout << "Logged" << std::endl;
+		matrixSave.close();
+	}
 
 	startTime = high_resolution_clock::now();
 	for (size_t i = 0; i < numberOfThreads; i++)
@@ -132,7 +155,10 @@ int main(int argc, char* argv[])
 	cout << "Calculated in " << elapsed2.count() * 1e-9 << " s\n";
 	cout << "total: " << (elapsed.count() + elapsed2.count()) * 1e-9 << " s\n" << std::endl;
 
-	/*print(matrixSave);
-	cout << "Logged" << std::endl;*/
-	matrixSave.close();
+	if (logMatrix)
+	{
+		print(matrixSave2);
+		cout << "logged" << std::endl;
+		matrixSave2.close();
+	}
 }
