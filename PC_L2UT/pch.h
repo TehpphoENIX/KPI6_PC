@@ -8,5 +8,9 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
+#include <random>
+#include <chrono>
+#include <vector>
+#include <iostream>
 
 #endif //PCH_H

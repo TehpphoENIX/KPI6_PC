@@ -1,35 +1,56 @@
-// test.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
-#include <iostream>
 #include <thread>
-#include <chrono>
+#include <functional>
+#include <mutex>
+#include <condition_variable>
+#include <iostream>
 
+using namespace std::placeholders;
+class Application
+{
+    std::mutex m_mutex;
+    std::condition_variable m_condVar;
+    bool m_bDataLoaded;
+public:
+    Application()
+    {
+        m_bDataLoaded = false;
+    }
+    void loadData()
+    {
+        // Make This Thread sleep for 1 Second
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::cout << "Loading Data from XML" << std::endl;
+        // Lock The Data structure
+        std::lock_guard<std::mutex> guard(m_mutex);
+        // Set the flag to true, means data is loaded
+        m_bDataLoaded = true;
+        // Notify the condition variable
+        m_condVar.notify_one();
+    }
+    bool isDataLoaded()
+    {
+        return m_bDataLoaded;
+    }
+    void mainTask()
+    {
+        std::cout << "Do Some Handshaking" << std::endl;
+        // Acquire the lock
+        std::unique_lock<std::mutex> mlock(m_mutex);
+        // Start waiting for the Condition Variable to get signaled
+        // Wait() will internally release the lock and make the thread to block
+        // As soon as condition variable get signaled, resume the thread and
+        // again acquire the lock. Then check if condition is met or not
+        // If condition is met then continue else again go in wait.
+        m_condVar.wait(mlock, std::bind(&Application::isDataLoaded, this));
+        std::cout << "Do Processing On loaded Data" << std::endl;
+    }
+};
 int main()
 {
-    std::thread thread([] 
-        {
-            while (true)
-            {
-                std::cout << "a";
-                std::this_thread::sleep_for(std::chrono::seconds(3));
-            }
-
-        }
-    );
-    thread.detach();
-    std::cout << "detached\n";
-    std::this_thread::sleep_for(std::chrono::seconds(15));
-    std::cout << "end\n";
+    Application app;
+    std::thread thread_1(&Application::mainTask, &app);
+    std::thread thread_2(&Application::loadData, &app);
+    thread_2.join();
+    thread_1.join();
+    return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

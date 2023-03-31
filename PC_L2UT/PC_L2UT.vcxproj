@@ -134,6 +134,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>../PC_L2/Debug/ThreadPool.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -170,6 +171,9 @@
   <ItemGroup>
     <ProjectReference Include="..\PC_L2\example_win32_directx11.vcxproj">
       <Project>{9f316e83-5ae5-4939-a723-305a94f48005}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\test\test.vcxproj">
+      <Project>{e503eedf-1279-4f72-b962-60e135fcdbb8}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
