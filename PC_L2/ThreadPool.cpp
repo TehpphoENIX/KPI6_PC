@@ -1,17 +1,24 @@
 #include "ThreadPool.h"
 #include <chrono>
 
-#define LOCK_MUTEX std::unique_lock<std::mutex> lock(rwLock)
+#define LOCK_MUTEX std::unique_lock<std::mutex> lock(*rwLock)
 
 void ThreadPool::runner() {
-	while (!stop)
+	std::shared_ptr<std::mutex> mutex(rwLock);
+	std::shared_ptr<bool> localStop(stop);
+	{
+		std::unique_lock<std::mutex> lock(*mutex);
+		unitializedCounter--;
+		if (unitializedCounter == 0) condition.notify_one();
+	}
+	while (!*localStop)
 	{
 		
 		unsigned int task;
 		{
-			LOCK_MUTEX;
-			condition.wait(lock, [this] {return stop || (running && !priorityQueue.empty()); });
-			if (stop) 
+			std::unique_lock<std::mutex> lock(*mutex);
+			condition.wait(lock, [=] {return *localStop || (running && !priorityQueue.empty()); });
+			if (*localStop) 
 			{
 				break;
 			}
@@ -29,6 +36,8 @@ ThreadPool::ThreadPool(bool ExitImmediatlyOnTerminate) :
 	{
 		threads.emplace_back(std::thread(&ThreadPool::runner, this));
 	}
+	LOCK_MUTEX;
+	condition.wait(lock, [this] {return unitializedCounter == 0; });
 }
 
 ThreadPool::~ThreadPool()
@@ -43,8 +52,8 @@ void ThreadPool::terminate()
 {
 	{
 		LOCK_MUTEX;
-		if (stop) return;
-		else stop = true;
+		if (*stop) return;
+		else *stop = true;
 		running = true;
 	}
 
@@ -60,8 +69,8 @@ void ThreadPool::terminateIm()
 {
 	{
 		LOCK_MUTEX;
-		if (stop) return;
-		else stop = true;
+		if (*stop) return;
+		else *stop = true;
 	}
 
 	condition.notify_all();

@@ -60,10 +60,6 @@ namespace PC_L2_UnitTest
 				tp.addTask(item);
 			}
 
-			std::this_thread::sleep_for(std::chrono::seconds(1));
-			tp.pause();
-			std::this_thread::sleep_for(std::chrono::seconds(5));
-			tp.unpause();
 			std::this_thread::sleep_for(std::chrono::seconds(5));
 
 			tp.terminate();
@@ -72,7 +68,7 @@ namespace PC_L2_UnitTest
 		TEST_METHOD(FullCompletion)
 		{
 			std::mt19937 generator;
-			std::uniform_int_distribution<unsigned int> distribution(1, 3);
+			std::uniform_int_distribution<unsigned int> distribution(10, 15);
 			std::vector<unsigned int> tasks;
 			for (size_t i = 0; i < 10; i++)
 			{
@@ -92,7 +88,7 @@ namespace PC_L2_UnitTest
 
 		TEST_METHOD(PauseTest) {
 			std::mt19937 generator;
-			std::uniform_int_distribution<unsigned int> distribution(1, 3);
+			std::uniform_int_distribution<unsigned int> distribution(10, 15);
 			std::vector<unsigned int> tasks;
 			for (size_t i = 0; i < 10; i++)
 			{

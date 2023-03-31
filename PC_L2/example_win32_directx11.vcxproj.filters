@@ -53,9 +53,6 @@
     <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\README.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="ImGUI">
       <UniqueIdentifier>{9325a0f7-7141-486a-95f1-3d9e26f20353}</UniqueIdentifier>
     </Filter>

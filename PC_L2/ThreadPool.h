@@ -5,6 +5,7 @@
 #include <functional>
 #include <mutex>
 #include <condition_variable>
+#include <memory>
 
 #define NUMBER_OF_THREADS 4
 
@@ -13,11 +14,13 @@ class ThreadPool
 private:
 	std::vector<std::thread> threads;
 	bool running = true;
-	bool stop = false;
+	std::shared_ptr<bool> stop = std::make_shared<bool>(false);
 	const bool exitImmediatlyOnTerminate;
 
+	unsigned int unitializedCounter = NUMBER_OF_THREADS;
+
 	std::priority_queue<unsigned int, std::vector<unsigned int>, std::greater<unsigned int> > priorityQueue;
-	std::mutex rwLock;
+	std::shared_ptr<std::mutex> rwLock = std::make_shared<std::mutex>();
 	std::condition_variable condition;
 public:
 	void runner();
