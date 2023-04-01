@@ -13,19 +13,35 @@ void ThreadPool::runner() {
 	}
 	while (!*localStop)
 	{
-		
 		unsigned int task;
 		{
 			std::unique_lock<std::mutex> lock(*mutex);
+			auto startTime = std::chrono::high_resolution_clock::now();
 			condition.wait(lock, [=] {return *localStop || (running && !priorityQueue.empty()); });
+			auto endTime = std::chrono::high_resolution_clock::now();
 			if (*localStop) 
 			{
 				break;
 			}
+			else
+			{
+				avgWaitTimeVar = (avgWaitTimeVar * avgWaitTimeDivider + std::chrono::duration<double>(endTime - startTime).count()) / (avgWaitTimeDivider + 1);
+				avgWaitTimeDivider++;
+			}
 			task = priorityQueue.top();
 			priorityQueue.pop();
 		}
+		auto startTime = std::chrono::high_resolution_clock::now();
 		std::this_thread::sleep_for(std::chrono::seconds(task));
+		auto endTime = std::chrono::high_resolution_clock::now();
+		{
+			std::unique_lock<std::mutex> lock(*mutex);
+			if (!*localStop)
+			{
+				avgTaskCompletionTimeVar = (avgTaskCompletionTimeVar * avgTaskCompletionTimeDivider + std::chrono::duration<double>(endTime - startTime).count()) / (avgTaskCompletionTimeDivider + 1);
+				avgTaskCompletionTimeDivider++;
+			}
+		}
 	}
 }
 
@@ -123,4 +139,30 @@ unsigned int ThreadPool::currentQueueSize()
 {
 	LOCK_MUTEX;
 	return priorityQueue.size();
+}
+
+double ThreadPool::avgWaitTime()
+{
+	LOCK_MUTEX;
+	return avgWaitTimeVar;
+}
+
+void ThreadPool::avgWaitTimeReset()
+{
+	LOCK_MUTEX;
+	avgWaitTimeVar = 0.0;
+	avgWaitTimeDivider = 0;
+}
+
+double ThreadPool::avgTaskCompletionTime()
+{
+	LOCK_MUTEX;
+	return avgTaskCompletionTimeVar;
+}
+
+void ThreadPool::avgTaskCompletionTimeReset()
+{
+	LOCK_MUTEX;
+	avgTaskCompletionTimeVar = 0.0;
+	avgTaskCompletionTimeDivider = 0;
 }

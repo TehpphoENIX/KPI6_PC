@@ -22,6 +22,13 @@ private:
 	std::priority_queue<unsigned int, std::vector<unsigned int>, std::greater<unsigned int> > priorityQueue;
 	std::shared_ptr<std::mutex> rwLock = std::make_shared<std::mutex>();
 	std::condition_variable condition;
+
+	double avgWaitTimeVar = 0.0;
+	unsigned int avgWaitTimeDivider = 0;
+
+	double avgTaskCompletionTimeVar = 0.0;
+	unsigned int avgTaskCompletionTimeDivider = 0;
+
 public:
 	void runner();
 
@@ -42,7 +49,9 @@ public:
 
 	unsigned int numberOfThreds() { return NUMBER_OF_THREADS; }
 	double avgWaitTime();
+	void avgWaitTimeReset();
 	double avgQueueSize();
 	double avgTaskCompletionTime();
+	void avgTaskCompletionTimeReset();
 };
 
