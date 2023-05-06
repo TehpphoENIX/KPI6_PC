@@ -15,11 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp">
+    <ClCompile Include="PC_L3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="t7.cpp">
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="rapidscv.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
+    </ClInclude>
   </ItemGroup>
 </Project>

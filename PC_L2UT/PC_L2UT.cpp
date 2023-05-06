@@ -205,7 +205,7 @@ namespace PC_L2_UnitTest
 			}
 			Assert::AreEqual(0u, tp.currentQueueSize());
 			Logger::WriteMessage(("numberOfThreads: " + std::to_string(tp.numberOfThreds()) + '\n').c_str());
-			Logger::WriteMessage(("AvgWaitTime: " + std::to_string(tp.avgWaitTime()) + " seconds\n").c_str());
+			Logger::WriteMessage(("AvgWaitTime: " + std::to_string(tp.avgWaitTime()) + " ns\n").c_str());
 			Logger::WriteMessage(("AvgTaskCompletionTime: " + std::to_string(tp.avgTaskCompletionTime()) + " seconds\n").c_str());
 			Logger::WriteMessage(("AvgQueueSize: " + std::to_string(tp.avgQueueSize()) + '\n').c_str());
 		}

@@ -33,7 +33,7 @@ void ThreadPool::runner(unsigned short id) {
 			}
 			else
 			{
-				avgWaitTimeVar += std::chrono::duration<double>(endTime - startTime).count();
+				avgWaitTimeVar += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime).count();
 				avgWaitTimeDivider++;
 			}
 			updateAvgQueueSize();

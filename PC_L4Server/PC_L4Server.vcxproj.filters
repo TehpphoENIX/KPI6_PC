@@ -15,10 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="t7.cpp">
+    <ClCompile Include="PC_L4Server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
