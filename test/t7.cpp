@@ -30,4 +30,6 @@ int Tmain()
 	}
 
 	std::cout << "Value: " << value << std::endl;
+
+	return 0;
 }

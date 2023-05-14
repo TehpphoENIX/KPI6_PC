@@ -144,6 +144,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="PC_L4Server.cpp" />
+    <ClCompile Include="Request.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BitDecypher.h" />
+    <ClInclude Include="Request.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
